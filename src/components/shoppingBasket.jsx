@@ -1,4 +1,4 @@
-function ShoppingBasket({ myCart, lessFromCart }) {
+function ShoppingBasket({ myCart, lessFromCart,sum }) {
     return (
       <>
         <h1>העגלה שלי</h1>
@@ -10,6 +10,7 @@ function ShoppingBasket({ myCart, lessFromCart }) {
               <li key={item.code}>
                 {item.name} - {item.price} ש"ח
                 <button onClick={() => lessFromCart(item.code)}>הסר</button>
+                {/* <p >{sum}:סה"כ לתשלום </p> */}
               </li>
             ))}
           </ul>

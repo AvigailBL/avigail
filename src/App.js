@@ -1,10 +1,14 @@
 import './App.css';
 import Product from './components/Product';
 import { Routing } from './components/Routing';
- import { BrowserRouter as Router, Link } from 'react-router-dom';
- import { useState } from "react"
+ import { BrowserRouter , Link } from 'react-router-dom';
+ import { useState,useEffect } from "react"
+import { Myprovider } from './contexst/context';
+import { CreateStore } from './contexst/store';
 
 function App() {
+
+const store=CreateStore();
 
   const [products, setproducts] = useState([
 
@@ -61,15 +65,27 @@ function App() {
 
 
 const [codeCounter, setCodeCounter] = useState(1); // מונה רץ למזהה
+const [sum,setSum]=useState(0);
+const [myCart ,setmyCart]=useState([]);
 
-const [myCart ,setmyCart]=useState([])
+
+const calculateSum = () => {
+  return myCart.reduce((acc, item) => acc + item.price, 0);
+}
 
 //פונקצית הוספה+ עדכון קוד רץ
 const addCart=(products)=>{
+  const price = typeof products.price === 'string' ? parseInt(products.price.replace(/[^\d]/g, '')) : products.price;
+
   const productWithCode = { ...products, code: codeCounter }; // הוספת מזהה ייחודי למוצר
   setmyCart ([...myCart,productWithCode])
   setCodeCounter((codeCounter) => codeCounter + 1); // עדכון המונה הרץ
   };
+
+  
+  
+
+
 
   //פונקצית הסרה
   const lessFromCart=(code)=>{
@@ -77,12 +93,16 @@ const addCart=(products)=>{
     setmyCart((myCart)=> myCart.filter((item)=>item.code!==code))
   }
  
-  
+  useEffect(() => {
+    setSum(calculateSum()); // עדכון הסכום עם כל שינוי בעגלה
+  }, [myCart]);
 
 
 
   return (
     
+    <Myprovider value={store}>
+      <BrowserRouter>  
       <div className="App">
         <header>
           <h1> הגלרייה של לואיס</h1>
@@ -90,18 +110,20 @@ const addCart=(products)=>{
           <Link to="/About">אודות </Link>
           <Link to="/Product"> מוצרים</Link>
           <Link to="/ContactUs"> צור קשר</Link>
+          <Link to="/Connections">התחברות</Link>
           <Link to={"/shoppingBasket/"}> העגלה שלי({myCart.length})</Link>
 
         </header>
         <main>
           {/*שליחה לראוטר את הערכים שנצטרך להשתמש בהם בכל הקומפוננטות*/}
-          <Routing products={products} addCart={addCart} myCart={myCart} lessFromCart={lessFromCart} />
+          <Routing products={products} addCart={addCart} myCart={myCart} lessFromCart={lessFromCart} sum={sum} />
           
           
         </main>
         <footer >&copy;    AVIGAILBL   כל הזכויות שמורות</footer>
       </div>
-   
+      </BrowserRouter>  
+      </Myprovider>
   );
 }
 
